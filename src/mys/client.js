@@ -1,5 +1,5 @@
-const { get, post } = require('axios').default;
-const _get = require('lodash.get');
+const _ = require('lodash');
+const { get, post } = require('axios');
 const dvid = require('./dvid');
 const ds = require('./ds');
 
@@ -7,7 +7,7 @@ const act_id = 'e202009291139501';
 
 const maskUid = uid => uid.substr(-3).padStart(uid.length, '*');
 
-module.exports = class Client {
+module.exports = class MysClient {
   constructor(cookie) {
     this.headers = {
       'x-rpc-device_id': dvid(),
@@ -26,19 +26,23 @@ module.exports = class Client {
       headers: this.headers,
     })
       .then(({ data }) => {
-        const list = _get(data, 'data.list');
-        if (!list) throw new Error(JSON.stringify(data));
+        const list = _.get(data, 'data.list');
+        if (!list) {
+          global.failed = true;
+          console.error(JSON.stringify(data));
+          return;
+        }
         return list;
       })
       .catch(e => {
         global.failed = true;
         console.error('角色信息请求失败');
-        console.error(String(e));
+        console.error(e.toString());
         return [];
       });
   }
 
-  sign({ region, game_uid: uid, region_name }) {
+  checkin({ region, game_uid: uid, region_name }) {
     return post(
       'https://api-takumi.mihoyo.com/event/bbs_sign_reward/sign',
       { act_id, region, uid },
@@ -51,7 +55,7 @@ module.exports = class Client {
       .catch(e => {
         global.failed = true;
         console.error(maskUid(uid), region_name, '签到请求失败');
-        console.error(String(e));
+        console.error(e.toString());
       });
   }
 };
