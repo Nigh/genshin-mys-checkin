@@ -3,13 +3,13 @@ name: Genshin MYS Checkin
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 23 * * *'
+    - cron: '1 19,23 * * *'
 
 jobs:
   checkin:
     runs-on: ubuntu-latest
-    env:
-      RUN_CACHE: ${{ !!secrets.WB_CONFIG }}
+    #env:
+      #RUN_CACHE: ${{ !!secrets.WB_CONFIG }}
 
     steps:
       - name: Checkout
@@ -46,5 +46,5 @@ jobs:
       - name: Checkin
         env:
           COOKIE: ${{ secrets.COOKIE }}
-          WB_CONFIG: ${{ secrets.WB_CONFIG }}
+          #WB_CONFIG: ${{ secrets.WB_CONFIG }}
         run: yarn start
