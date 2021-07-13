@@ -8,6 +8,8 @@ on:
 jobs:
   checkin:
     runs-on: ubuntu-latest
+    env:
+      RUN_CACHE: ${{ !!secrets.WB_CONFIG }}
 
     steps:
       - name: Checkout
@@ -24,6 +26,15 @@ jobs:
           upstream_branch: main
           target_branch: main
           git_pull_args: '-s recursive -Xtheirs'
+
+      - name: Cache
+        if: env.RUN_CACHE == 'true'
+        uses: actions/cache@v2
+        with:
+          path: cache
+          key: gc-cache-v3-${{ github.run_id }}
+          restore-keys: |
+            gc-cache-v3-
 
       - name: Install dependencies
         run: yarn install
